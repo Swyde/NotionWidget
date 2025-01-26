@@ -20,7 +20,7 @@
       padding: 15px;
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      width: 200px;
+      width: 220px;
     }
     .timer-display {
       font-size: 24px;
@@ -78,6 +78,24 @@
     .countdown-controls button:hover {
       background: #1e88e5;
     }
+    .mode-switch {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+    }
+    .mode-switch button {
+      padding: 5px 15px;
+      font-size: 14px;
+      background: #673ab7;
+      color: white;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .mode-switch button:hover {
+      background: #5e35b1;
+    }
   </style>
 </head>
 <body>
@@ -88,9 +106,12 @@
       <button id="pause-button" disabled>Pause</button>
       <button id="reset-button" disabled>Reset</button>
     </div>
-    <div class="countdown-controls">
+    <div class="countdown-controls" id="countdown-controls">
       <button id="decrease-time">-</button>
       <button id="increase-time">+</button>
+    </div>
+    <div class="mode-switch">
+      <button id="mode-switch">Passer au chronomètre</button>
     </div>
   </div>
 
@@ -99,7 +120,7 @@
     let elapsedTime = 0;
     let initialTime = 0;
     let isRunning = false;
-    let isCountdown = false;
+    let isCountdown = true; // Mode countdown activé par défaut
 
     const timerDisplay = document.getElementById('timer-display');
     const startButton = document.getElementById('start-button');
@@ -107,6 +128,8 @@
     const resetButton = document.getElementById('reset-button');
     const decreaseTimeButton = document.getElementById('decrease-time');
     const increaseTimeButton = document.getElementById('increase-time');
+    const modeSwitchButton = document.getElementById('mode-switch');
+    const countdownControls = document.getElementById('countdown-controls');
 
     function formatTime(time) {
       const hours = String(Math.floor(time / 3600)).padStart(2, '0');
@@ -163,15 +186,26 @@
     }
 
     function adjustInitialTime(amount) {
-      initialTime = Math.max(0, initialTime + amount);
+      if (isCountdown) {
+        initialTime = Math.max(0, initialTime + amount);
+        updateDisplay();
+      }
+    }
+
+    function switchMode() {
+      isCountdown = !isCountdown;
+      resetTimer();
       updateDisplay();
+      countdownControls.style.display = isCountdown ? 'flex' : 'none';
+      modeSwitchButton.textContent = isCountdown ? 'Passer au chronomètre' : 'Passer au minuteur';
     }
 
     startButton.addEventListener('click', startTimer);
     pauseButton.addEventListener('click', pauseTimer);
     resetButton.addEventListener('click', resetTimer);
-    decreaseTimeButton.addEventListener('click', () => adjustInitialTime(-60)); // Decrease by 1 minute
-    increaseTimeButton.addEventListener('click', () => adjustInitialTime(60)); // Increase by 1 minute
+    decreaseTimeButton.addEventListener('click', () => adjustInitialTime(-60)); // Diminue de 1 minute
+    increaseTimeButton.addEventListener('click', () => adjustInitialTime(60)); // Augmente de 1 minute
+    modeSwitchButton.addEventListener('click', switchMode);
 
     updateDisplay();
   </script>
