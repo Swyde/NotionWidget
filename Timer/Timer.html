@@ -20,7 +20,7 @@
       padding: 10px;
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      width: 180px;
+      width: 130px;
     }
     .timer-display {
       font-size: 20px;
@@ -28,8 +28,8 @@
     }
     .buttons {
       display: flex;
-      flex-direction: column;
-      gap: 3px;
+      justify-content: space-between;
+      margin-bottom: 5px;
     }
     button {
       padding: 5px;
@@ -102,16 +102,16 @@
   <div class="timer">
     <div class="timer-display" id="timer-display">00:00:00</div>
     <div class="buttons">
-      <button id="start-button">Start</button>
-      <button id="pause-button" disabled>Pause</button>
-      <button id="reset-button" disabled>Reset</button>
+      <button id="start-button">⏵</button>
+      <button id="pause-button" disabled>⏸</button>
+      <button id="reset-button" disabled>⏹</button>
     </div>
     <div class="countdown-controls" id="countdown-controls">
       <button id="decrease-time">-</button>
       <button id="increase-time">+</button>
     </div>
     <div class="mode-switch">
-      <button id="mode-switch">Passer au chronomètre</button>
+      <button id="mode-switch">Chronomètre</button>
     </div>
   </div>
 

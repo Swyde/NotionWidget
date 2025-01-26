@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget Minuteur</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+      color: #fff;
+    }
+
+    .widget {
+    
+      border-width: 3px;
+      border-color: rgb(82, 83, 85);
+      border-style: solid;
+      width: 200px;
+      height: 200px;
+      background: #212325;
+      border-radius: 20px;
+
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 0px;
+      padding: 0px;
+    }
+
+    .tab {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ccc;
+      cursor: pointer;
+      
+    }
+
+    .tab.active {
+      
+      background: rgb(57, 58, 59);
+    }
+
+    .time {
+      font-size: 4rem;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .progress-bar {
+      width: 80%;
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 0 auto 10px;
+      position: relative;
+    }
+
+    .progress {
+      height: 100%;
+      background: rgb(57, 58, 59);
+      width: 100%;
+      transition: width 0.2s;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+
+    .button.round {
+      display: none;
+    }
+
+    .secondary,
+    .controlsbutton {
+      background: none;
+      color:rgb(57, 58, 59);
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .third{
+        background: none;
+        color:rgb(57, 58, 59);
+        border: none;
+        cursor: pointer;
+        padding-bottom: 0px;
+    }
+
+
+    .button {
+      padding: 10px 20px;
+      background: rgb(57, 58, 59);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="tabs">
+      <div class="tab active" data-mode="timer"></div>
+      <div class="tab" data-mode="stopwatch"></div>
+    </div>
+    <div class="time" id="time-display" contenteditable="true">00:00</div>
+    <div class="progress-bar" id="progress-container">
+      <div class="progress" id="progress"></div>
+    </div>
+    <div class="controls">
+      <button class="third"id="decrease">-</button>
+      <button class="button" id="start-stop">Start</button>
+      <button class="secondary" id="increase">+</button>
+    </div>
+    <button class="secondary" id="cancel">Cancel</button>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const timeDisplay = document.getElementById('time-display');
+    const progressContainer = document.getElementById('progress-container');
+    const progress = document.getElementById('progress');
+    const startStopButton = document.getElementById('start-stop');
+    const decreaseButton = document.getElementById('decrease');
+    const increaseButton = document.getElementById('increase');
+    const cancelButton = document.getElementById('cancel');
+
+    let mode = 'timer';
+    let timerInterval = null;
+    let time = 0; // in seconds
+    let totalTime = 300; // Default total time
+
+    function updateDisplay() {
+      const minutes = String(Math.floor(time / 60)).padStart(2, '0');
+      const seconds = String(time % 60).padStart(2, '0');
+      timeDisplay.textContent = `${minutes}:${seconds}`;
+    }
+
+    function updateProgress() {
+      progress.style.width = mode === 'timer' ? `${(time / totalTime) * 100}%` : '0';
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        mode = tab.dataset.mode;
+        reset();
+
+        if (mode === 'stopwatch') {
+          progressContainer.style.display = 'none';
+          decreaseButton.style.display = 'none';
+          increaseButton.style.display = 'none';
+        } else {
+          progressContainer.style.display = 'block';
+          decreaseButton.style.display = 'inline-block';
+          increaseButton.style.display = 'inline-block';
+        }
+      });
+    });
+
+    startStopButton.addEventListener('click', () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        startStopButton.textContent = 'Start';
+      } else {
+        startStopButton.textContent = 'Stop';
+        timerInterval = setInterval(() => {
+          if (mode === 'timer') {
+            if (time > 0) {
+              time--;
+              updateDisplay();
+              updateProgress();
+            } else {
+              clearInterval(timerInterval);
+              timerInterval = null;
+              alert('Time is up!');
+            }
+          } else if (mode === 'stopwatch') {
+            time++;
+            updateDisplay();
+          }
+        }, 1000);
+      }
+    });
+
+    decreaseButton.addEventListener('click', () => {
+      if (mode === 'timer' && time > 0) {
+        time--;
+        totalTime = time;
+        updateDisplay();
+        updateProgress();
+      }
+    });
+
+    increaseButton.addEventListener('click', () => {
+      if (mode === 'timer') {
+        time++;
+        totalTime = time;
+        updateDisplay();
+        updateProgress();
+      }
+    });
+
+    cancelButton.addEventListener('click', reset);
+
+    timeDisplay.addEventListener('blur', () => {
+      const [minutes, seconds] = timeDisplay.textContent.split(':').map(Number);
+      if (!isNaN(minutes) && !isNaN(seconds)) {
+        time = minutes * 60 + seconds;
+        totalTime = time;
+        updateProgress();
+      } else {
+        updateDisplay(); // Reset to last valid state if invalid input
+      }
+    });
+
+    function reset() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      startStopButton.textContent = 'Start';
+      time = mode === 'timer' ? totalTime : 0;
+      updateDisplay();
+      updateProgress();
+    }
+
+    // Initialize
+    reset();
+  </script>
+</body>
+</html>
